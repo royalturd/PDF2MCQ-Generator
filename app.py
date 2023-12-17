@@ -70,3 +70,28 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+def test_regex():
+    data_str = """
+    {
+        "Question": "What is the capital of France?",
+        "Options": ["Paris", "London", "Rome", "Berlin"],
+        "Answer": "Paris"
+    }
+    """
+
+    question_blocks = re.findall(r"\{[^}]*\}", data_str)
+
+    assert len(question_blocks) == 1
+
+    question = re.search(r'"Question": "([^"]*)"', question_blocks[0]).group(1)
+    assert question == "What is the capital of France?"
+
+    options = re.findall(
+        r'"([^"]*)"',
+        re.search(r'"Options": (\[[^\]]*\])', question_blocks[0]).group(1)
+    )
+    assert options == ["Paris", "London", "Rome", "Berlin"]
+
+    answer = re.search(r'"Answer": "([^"]*)"', question_blocks[0]).group(1)
+    assert answer == "Paris"
